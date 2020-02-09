@@ -1,17 +1,21 @@
-import argparse
+from flask import Flask, request
+from twilio import twiml
+
 from py_messenger import sms_client
 
-# parse Arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("action", type=str, choices=['text'])
-parser.add_argument('-n', action="store", dest="number")
-parser.add_argument('-m', action="store", dest="message")
-args = parser.parse_args()
+app = Flask(__name__)
 
 
-def send_sms_message(destination_number: str, sms_message: str):
-    sms_client.send_sms_message(destination_number, sms_message)
+@app.route('/sms', methods=['POST'])
+def sms():
+    number = request.form['From']
+    message_body = request.form['Body']
+    print(f'Received a message from {number}: {message_body}')
+
+    # resp = twiml.Response()
+    # resp.message('Hello {}, you said: {}'.format(number, message_body))
+    # return str(resp)
 
 
-if args.action == 'text':
-    send_sms_message(args.number, args.message)
+if __name__ == '__main__':
+    app.run()
