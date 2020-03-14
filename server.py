@@ -1,12 +1,49 @@
 from flask import Flask, request, Response
-from py_messenger import sms_client
+import threading
+import time
 
 app = Flask(__name__)
+
+server_state = False
+
+
+class SubThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+
+    def run(self):
+        global server_state
+        while True:
+            if not server_state:
+                break
+            print("Doing health stuff!")
+            time.sleep(5)
+
+
+# Init the global var used to hold the thread
+init_thread = SubThread()
 
 
 @app.route('/', methods=['GET'])
 def health_check():
-    return str('Hey, this is py-messenger!')
+    global server_state
+    return str('Health-Kit flask-server up and running! The current thread-state is: ' + str(server_state))
+
+
+@app.route('/state')
+def toggle_on_off():
+    global server_state
+    global init_thread
+    if not server_state:
+        server_state = True
+        init_thread = SubThread()
+        init_thread.start()
+        print(f'Request: Turned on health-kit')
+        return "Health-Kit has been toggled ON"
+    else:
+        server_state = False
+        print(f'Request: Turned off health-kit')
+        return "Health-Kit has been toggled OFF"
 
 
 @app.route('/inbound', methods=['POST'])
@@ -17,13 +54,8 @@ def inbound_sms():
     return Response(status=204)
 
 
-@app.route('/outbound', methods=['POST'])
-def outbound_sms():
-    destination_number = request.json['destination']
-    message = request.json['message']
-    sms_client.send_sms_message(destination_number, message)
-    return Response(status=204)
-
+# Start the first thread
+toggle_on_off()
 
 if __name__ == '__main__':
     app.run()
