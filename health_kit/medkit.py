@@ -11,9 +11,9 @@ class MedProfile:
         if scheduler.get_time_now() > scheduler.add_hours(self.last_taken, 4):
             # If taken list is not full
             if 0 in self.taken_list:
-                for e in self.taken_list:
-                    if e == 0:
-                        e = 1
+                for i, ele in enumerate(self.taken_list):
+                    if ele == 0:
+                        self.taken_list[i] = 1
                         break
             print(self.taken_list)
             print("I'm gonna send a message!")
