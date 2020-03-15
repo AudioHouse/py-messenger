@@ -1,6 +1,7 @@
 from flask import Flask, request, Response
 import threading
 import time
+from health_kit import medkit
 
 app = Flask(__name__)
 
@@ -15,8 +16,9 @@ class SubThread(threading.Thread):
         global server_state
         while True:
             if not server_state:
+                print("END: Exiting thread...")
                 break
-            print("Doing health stuff!")
+            medkit.run()
             time.sleep(5)
 
 
