@@ -28,7 +28,7 @@ init_thread = SubThread()
 
 def stop_if_msg_stop(msg):
     global server_state
-    if 'Stop' in str(msg) or 'stop' in str(msg) or 'STOP' in str(msg):
+    if 'Off' in str(msg) or 'off' in str(msg) or 'OFF' in str(msg):
         server_state = False
 
 
