@@ -1,6 +1,15 @@
 from . import scheduler
+from py_messenger import sms_client as sms, config
 
 message_cache = []
+destination_number = config.Config.destination_number
+
+
+class TextProfile:
+    test = 'Hello! It is time to take your medicine! Have you taken it yet?'
+
+    def ask_if_taken(self):
+        return self.test
 
 
 class MedProfile:
@@ -8,6 +17,7 @@ class MedProfile:
     taken_list = [0, 0, 0, 0]
     last_taken = scheduler.get_zero_time()
     last_sent = scheduler.get_zero_time()
+    text_profile = TextProfile()
 
     @staticmethod
     def check_yes_in_cache():
@@ -30,8 +40,14 @@ class MedProfile:
         message_cache = []
 
     def send_dosage_alert(self):
-        print("sending message")
+        print("Sending dosage alert")
+        sms.send_sms_message(destination_number, self.text_profile.ask_if_taken())
         self.last_sent = scheduler.get_time_now()
+
+    def print_status(self):
+        print(f'Med-Profile Status: taken-list: {self.taken_list}, '
+              f'last-taken: {self.last_taken}, '
+              f'last_sent: {self.last_sent}')
 
     def notify_for_dosage(self):
         # If it's been more than 4 hours since last dosage
@@ -44,6 +60,8 @@ class MedProfile:
                     # If it's been more than 30 min since last message sent
                     if scheduler.get_time_now() > scheduler.add_minutes(self.last_sent, 30):
                         self.send_dosage_alert()
+                    else:
+                        print(f"Message already sent on: {self.last_sent}. Waiting.")
 
         else:
             print("It has not been 4 hours since last dose")
