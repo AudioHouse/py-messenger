@@ -24,6 +24,7 @@ class MedProfile:
         global message_cache
         for elem in message_cache:
             if 'Yes' in str(elem) or 'yes' in str(elem):
+                print(f'Found "Yes" in message {elem}')
                 return True
         return False
 
@@ -50,6 +51,7 @@ class MedProfile:
               f'last_sent: {self.last_sent}')
 
     def notify_for_dosage(self):
+        self.print_status()
         # If it's been more than 4 hours since last dosage
         if scheduler.get_time_now() > scheduler.add_hours(self.last_taken, 4):
             # If dosage list is not full
@@ -68,6 +70,10 @@ class MedProfile:
 
 
 med_profile = MedProfile()
+
+
+def receive_message(message):
+    message_cache.append(message)
 
 
 def run():
