@@ -40,8 +40,18 @@ class MedProfile:
         self.update_dosage_list()
         message_cache = []
 
+    def reset_dosage_list(self):
+        for i, ele in enumerate(self.taken_list):
+            self.taken_list[i] = 0
+
+    def reset_state(self):
+        global message_cache
+        self.last_taken = scheduler.get_zero_time()
+        self.reset_dosage_list()
+        message_cache = []
+
     def send_dosage_alert(self):
-        print("Sending dosage alert")
+        print('Sending dosage alert')
         sms.send_sms_message(destination_number, self.text_profile.ask_if_taken())
         self.last_sent = scheduler.get_time_now()
 
@@ -64,10 +74,9 @@ class MedProfile:
                     if scheduler.get_time_now() > scheduler.add_minutes(self.last_sent, 30):
                         self.send_dosage_alert()
                     else:
-                        print(f"Message already sent on: {self.last_sent}. Waiting.")
-
+                        print(f'Message already sent on: {self.last_sent}. Waiting.')
         else:
-            print("It has not been 4 hours since last dose")
+            print('It has not been 4 hours since last dose')
 
 
 med_profile = MedProfile()
@@ -82,3 +91,7 @@ def run():
     # If the time of day is between 9-11
     if scheduler.check_active_range():
         med_profile.notify_for_dosage()
+    if scheduler.check_reset_range():
+        med_profile.reset_state()
+    else:
+        print(f'Outside operational time-range')

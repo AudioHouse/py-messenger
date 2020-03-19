@@ -27,3 +27,13 @@ def check_active_range():
         return True
     else:
         return False
+
+
+def check_reset_range():
+    now = get_time_now()
+    today1am = now.replace(hour=1, minute=0, second=0, microsecond=0)
+    today2am = now.replace(hour=2, minute=0, second=0, microsecond=0)
+    if (now > today1am) and (now < today2am):
+        return True
+    else:
+        return False
