@@ -53,6 +53,7 @@ def inbound_sms():
     number = request.form['From']
     message_body = request.form['Body']
     print(f'Received a message from {number}: {message_body}')
+    medkit.receive_message(message_body)
 
     return Response(status=204)
 

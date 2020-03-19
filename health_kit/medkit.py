@@ -46,9 +46,10 @@ class MedProfile:
         self.last_sent = scheduler.get_time_now()
 
     def print_status(self):
+        global message_cache
         print(f'Med-Profile Status: taken-list: {self.taken_list}, '
               f'last-taken: {self.last_taken}, '
-              f'last_sent: {self.last_sent}')
+              f'last_sent: {self.last_sent}, message_cache: {message_cache}')
 
     def notify_for_dosage(self):
         self.print_status()
@@ -73,6 +74,7 @@ med_profile = MedProfile()
 
 
 def receive_message(message):
+    global message_cache
     message_cache.append(message)
 
 
