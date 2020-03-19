@@ -63,8 +63,8 @@ class MedProfile:
 
     def notify_for_dosage(self):
         self.print_status()
-        # If it's been more than 4 hours since last dosage
-        if scheduler.get_time_now() > scheduler.add_hours(self.last_taken, 4):
+        # If it's been more than 3 hours since last dosage
+        if scheduler.get_time_now() > scheduler.add_hours(self.last_taken, 3):
             # If dosage list is not full
             if 0 in self.taken_list:
                 if self.check_yes_in_cache():
@@ -76,7 +76,7 @@ class MedProfile:
                     else:
                         print(f'Message already sent on: {self.last_sent}. Waiting.')
         else:
-            print('It has not been 4 hours since last dose')
+            print('It has not been 3 hours since last dose')
 
 
 med_profile = MedProfile()
