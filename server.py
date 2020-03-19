@@ -26,6 +26,18 @@ class SubThread(threading.Thread):
 init_thread = SubThread()
 
 
+def stop_if_msg_stop(msg):
+    global server_state
+    if 'Stop' in str(msg) or 'stop' in str(msg) or 'STOP' in str(msg):
+        server_state = False
+
+
+def start_if_msg_start(msg):
+    global server_state
+    if 'Start' in str(msg) or 'start' in str(msg) or 'START' in str(msg):
+        server_state = True
+
+
 @app.route('/', methods=['GET'])
 def health_check():
     global server_state
@@ -53,8 +65,14 @@ def inbound_sms():
     number = request.form['From']
     message_body = request.form['Body']
     print(f'Received a message from {number}: {message_body}')
-    medkit.receive_message(message_body)
 
+    # if msg has START, then start new thread
+    start_if_msg_start(message_body)
+
+    # if msg has STOP, then shut down the thread
+    stop_if_msg_stop(message_body)
+
+    medkit.receive_message(message_body)
     return Response(status=204)
 
 
