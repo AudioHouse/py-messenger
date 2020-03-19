@@ -6,10 +6,14 @@ destination_number = config.Config.destination_number
 
 
 class TextProfile:
-    test = 'Hello! It is time to take your medicine! Have you taken it yet?'
+    ask = 'Hello! It is time to take your medicine! Have you taken it yet?'
+    ack = 'Good job! I will remind you again in three hours.'
 
     def ask_if_taken(self):
-        return self.test
+        return self.ask
+
+    def ack_that_taken(self):
+        return self.ack
 
 
 class MedProfile:
@@ -19,12 +23,21 @@ class MedProfile:
     last_sent = scheduler.get_zero_time()
     text_profile = TextProfile()
 
-    @staticmethod
-    def check_yes_in_cache():
+    def send_dosage_alert(self):
+        print('Sending dosage alert')
+        sms.send_sms_message(destination_number, self.text_profile.ask_if_taken())
+        self.last_sent = scheduler.get_time_now()
+
+    def send_acknowledgement(self):
+        print('Sending acknowledgement')
+        sms.send_sms_message(destination_number, self.text_profile.ack_that_taken())
+
+    def check_yes_in_cache(self):
         global message_cache
         for elem in message_cache:
-            if 'Yes' in str(elem) or 'yes' in str(elem):
+            if 'Yes' in str(elem) or 'yes' in str(elem) or 'YES' in str(elem):
                 print(f'Found "Yes" in message {elem}')
+                self.send_acknowledgement()
                 return True
         return False
 
@@ -49,11 +62,6 @@ class MedProfile:
         self.last_taken = scheduler.get_zero_time()
         self.reset_dosage_list()
         message_cache = []
-
-    def send_dosage_alert(self):
-        print('Sending dosage alert')
-        sms.send_sms_message(destination_number, self.text_profile.ask_if_taken())
-        self.last_sent = scheduler.get_time_now()
 
     def print_status(self):
         global message_cache
